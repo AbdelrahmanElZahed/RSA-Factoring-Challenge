@@ -1,0 +1,56 @@
+#!/usr/bin/python3
+"""RSA Factoring Challenge: Factorize a number n into two prime numbers p and q"""
+
+import sys
+import time
+
+def is_prime(num):
+    """Checks if a number is prime"""
+    if num <= 1:
+        return False
+    if num == 2 or num == 3:
+        return True
+    if num % 2 == 0 or num % 3 == 0:
+        return False
+    i = 5
+    while i * i <= num:
+        if num % i == 0 or num % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def factorize_rsa(n):
+    """Finds two prime factors p and q such that p * q = n"""
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0 and is_prime(i) and is_prime(n // i):
+            return i, n // i
+    return None, None
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: rsa <file>")
+        sys.exit(1)
+    
+    file_path = sys.argv[1]
+    
+    try:
+        with open(file_path, 'r') as f:
+            number = int(f.readline().strip())
+        
+        start_time = time.time()
+        p, q = factorize_rsa(number)
+        if p and q:
+            print(f"{number}={p}*{q}")
+        else:
+            print(f"Failed to factorize {number}")
+        
+        if time.time() - start_time > 5:
+            print("Warning: Time limit exceeded.")
+    
+    except FileNotFoundError:
+        print(f"Error: {file_path} not found.")
+        sys.exit(1)
+    except ValueError:
+        print(f"Error: Invalid number found in the file.")
+        sys.exit(1)
+
